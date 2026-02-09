@@ -136,7 +136,7 @@ python run.py search "injection molding company Vietnam"
 
 ---
 
-## Test 7: Streamlit Web UI
+## Test 7: Streamlit Web UI — Single Proposal Tab
 
 ```bash
 cd ..   # back to project root
@@ -144,7 +144,28 @@ source venv/bin/activate
 streamlit run app.py
 ```
 
-Open http://localhost:8501. Select an example prospect or enter custom input, then click "Run Sales Agent Pipeline".
+Open http://localhost:8501. The UI has two tabs: **Single Proposal** and **Prospect Search**.
+
+### Tab 1: Single Proposal
+
+1. Select an example prospect from the dropdown (or enter custom input)
+2. Click **"Run Sales Agent Pipeline"** — watch all 3 agents run in sequence
+3. Expand **Research Brief** and **Solution Mapping** to review intermediate outputs
+4. Download the proposal as Markdown
+5. Click **"Generate Cold Email"** — runs the Deal Estimator + Email Writer agents
+6. Edit the email in the text area, enter a recipient address, and click **"Send Email"** (requires Gmail configured in `.env`)
+
+### Tab 2: Prospect Search
+
+1. Enter a search query (e.g. "metal stamping companies Germany")
+2. Set max results (5–20) and click **"Search"**
+3. The pipeline searches DuckDuckGo, then qualifies each prospect with the Deal Estimator + Quick Summary agents
+4. Review the prospect table (company, industry, email, estimated deal, category, confidence)
+5. Expand **"Quick Assessments"** for short fit summaries of each prospect
+6. Select companies from the multiselect and click **"Generate Detailed Proposals"**
+7. For each selected company, the full pipeline runs: Researcher → Solution Architect → Proposal Writer → Email Writer
+8. Review results — each company has tabs for Proposal, Email, and Research
+9. Download proposals/emails or send emails directly from the UI
 
 ---
 

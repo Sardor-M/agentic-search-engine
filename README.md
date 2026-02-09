@@ -4,57 +4,66 @@ An AI-powered B2B sales pipeline that automates company research, deal estimatio
 
 ## What It Does
 
-Six specialized Claude AI agents collaborate in two pipeline modes, powered by a RAG knowledge base and agentic tool-use:
+Six specialized Claude AI agents collaborate in two pipeline modes (with a full Streamlit web UI for both), powered by a RAG knowledge base and agentic tool-use:
 
 ```
-                         ┌──────────────────────────┐
-                         │     RAG Knowledge Base    │
-                         │  (ChromaDB Vector Store)  │
-                         │  Product docs + past runs │
-                         └────────────┬─────────────┘
+                          ┌──────────────────────────┐
+                          │     RAG Knowledge Base    │
+                          │  (ChromaDB Vector Store)  │
+                          │  Product docs + past runs │
+                          └────────────┬─────────────┘
+                                       │
+               ┌───────────────────────┼───────────────────────┐
+               │                       │                       │
+     ┌─────────v──────────┐  ┌────────v─────────┐  ┌─────────v──────────┐
+     │   search_web       │  │ query_knowledge  │  │ scrape_company     │
+     │   (DuckDuckGo)     │  │     _base        │  │   _website         │
+     └─────────┬──────────┘  └────────┬─────────┘  └─────────┬──────────┘
+               │                      │                      │
+               └──────────────────────┼──────────────────────┘
                                       │
-              ┌───────────────────────┼───────────────────────┐
-              │                       │                       │
-    ┌─────────v──────────┐  ┌────────v─────────┐  ┌─────────v──────────┐
-    │   search_web       │  │ query_knowledge  │  │ scrape_company     │
-    │   (DuckDuckGo)     │  │     _base        │  │   _website         │
-    └─────────┬──────────┘  └────────┬─────────┘  └─────────┬──────────┘
-              │                      │                      │
-              └──────────────────────┼──────────────────────┘
-                                     │
-                          ┌──────────v──────────┐
-                          │  Agentic Researcher │
-                          │  (multi-turn loop)  │
-                          └──────────┬──────────┘
-                                     │
-              ┌──────────────────────┼──────────────────────┐
-              │                      │                      │
-    Search Pipeline            Proposal Pipeline
-    ──────────────             ─────────────────
-    Deal Estimator             Solution Architect
-         │                          │
-    Email Writer               Proposal Writer
-         │
-    Gmail Send
-         │
-    Save + Index to RAG
+                           ┌──────────v──────────┐
+                           │  Agentic Researcher │
+                           │  (multi-turn loop)  │
+                           └──────────┬──────────┘
+                                      │
+               ┌──────────────────────┴──────────────────────┐
+               │                                             │
+     Single Proposal (Tab 1)                   Prospect Search (Tab 2)
+     ───────────────────────                   ────────────────────────
+     Solution Architect                        DuckDuckGo Search
+            │                                        │
+     Proposal Writer                           Deal Estimator
+            │                                  + Quick Summary
+     Deal Estimator (optional)                       │
+            │                                  Prospect Table
+     Email Writer                              + User Selection
+            │                                        │
+     Gmail Send                                Researcher → Architect
+                                               → Proposal Writer
+                                                     │
+                                               Email Writer
+                                                     │
+                                               Gmail Send
 ```
 
-### Search Mode
+### Single Proposal (Tab 1)
 
-Find companies, estimate deals, write and send personalized cold emails:
-
-```
-Search Query → DuckDuckGo → Contact Extraction → Deal Estimator → Table Display
-→ User Selection → Agentic Researcher → Email Writer → Gmail Send → Save + RAG Index
-```
-
-### Proposal Mode
-
-Generate a detailed multi-page sales proposal:
+Generate a detailed multi-page sales proposal with optional cold email:
 
 ```
-Company Input → Agentic Researcher → Solution Architect → Proposal Writer → Save
+Company Input → Agentic Researcher → Solution Architect → Proposal Writer
+→ (optional) Deal Estimator → Email Writer → Gmail Send
+```
+
+### Prospect Search (Tab 2)
+
+Search for companies, qualify prospects, then generate batch proposals and emails:
+
+```
+Search Query → DuckDuckGo → Deal Estimator + Quick Summary → Prospect Table
+→ User Selection → Agentic Researcher → Solution Architect → Proposal Writer
+→ Email Writer → Gmail Send
 ```
 
 ## What's New: RAG + Agentic Tool-Use
@@ -169,7 +178,7 @@ python run.py --interactive   # enter company details interactively
 agentic-pipeline/
 ├── src/
 │   ├── run.py           # CLI entry point — search, proposal, interactive modes
-│   ├── agents.py        # 5 Claude agents + agentic researcher with tool-use
+│   ├── agents.py        # 6 Claude agents + agentic researcher with tool-use
 │   ├── knowledge.py     # Product knowledge base (MV900 + Machine365.Ai)
 │   ├── rag.py           # ChromaDB RAG knowledge base (product + outreach indexing)
 │   ├── scraper.py       # Website text extraction (requests + BeautifulSoup)
@@ -179,7 +188,7 @@ agentic-pipeline/
 ├── outputs/             # Generated proposals and outreach JSON (auto-created)
 ├── requirements.txt
 ├── .env                 # API keys (not committed)
-└── app.py               # Streamlit UI (separate scope)
+└── app.py               # Streamlit UI (Single Proposal + Prospect Search tabs)
 ```
 
 ## The Agents
@@ -191,10 +200,11 @@ agentic-pipeline/
 | 3 | **Proposal Writer** | Single-turn | 0.7 | Generates a polished, ready-to-send Markdown sales proposal |
 | 4 | **Deal Estimator** | Single-turn | 0.3 | Estimates deal size as structured JSON (machine count, value, category) |
 | 5 | **Cold Email Writer** | Single-turn | 0.7 | Writes a short, personalized cold outreach email (under 200 words, plain text) |
+| 6 | **Quick Summary** | Single-turn | 0.5 | Produces a concise 3–8 sentence fit assessment for the prospect pipeline table |
 
-Agents 1-3 are used in **proposal** mode. Agents 1, 4, 5 are used in **search** mode.
+Agents 1–3 are used in **proposal** mode. Agents 1, 4, 5 are used in **search** mode. Agent 6 is used in the Streamlit **Prospect Search** tab to quickly qualify prospects before full proposal generation.
 
-Only the Researcher is agentic (multi-turn tool-use). The other 4 agents stay single-turn — they receive enriched context from the researcher and don't need tools.
+Only the Researcher is agentic (multi-turn tool-use). The other 5 agents stay single-turn — they receive enriched context from the researcher and don't need tools.
 
 ## RAG Knowledge Base
 
@@ -269,7 +279,8 @@ A full Markdown proposal with sections: Executive Summary, Challenges, Recommend
 
 ```
 anthropic>=0.40.0        # Claude API client
-streamlit>=1.38.0        # Web UI (optional)
+streamlit>=1.38.0        # Web UI
+pandas>=2.0.0            # Data tables in Streamlit prospect pipeline
 python-dotenv>=1.0.0     # .env file loading
 ddgs>=9.0.0              # DuckDuckGo search
 rich>=13.0.0             # Terminal formatting
