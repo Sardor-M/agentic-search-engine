@@ -8,11 +8,17 @@ for information about their manufacturing operations.
 import requests
 from bs4 import BeautifulSoup
 
-
 # Tags that contain noise, not content
 STRIP_TAGS = [
-    "script", "style", "nav", "footer", "header",
-    "aside", "form", "noscript", "iframe",
+    "script",
+    "style",
+    "nav",
+    "footer",
+    "header",
+    "aside",
+    "form",
+    "noscript",
+    "iframe",
 ]
 
 MAX_CHARS = 4000
@@ -32,8 +38,7 @@ def scrape_website(url: str) -> str:
             timeout=TIMEOUT,
             headers={
                 "User-Agent": (
-                    "Mozilla/5.0 (compatible; 3ViewResearchBot/1.0; "
-                    "+https://e3view.com)"
+                    "Mozilla/5.0 (compatible; 3ViewResearchBot/1.0; +https://e3view.com)"
                 ),
             },
         )

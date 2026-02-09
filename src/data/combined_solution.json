@@ -1,0 +1,29 @@
+{
+  "name": "MV900 + Machine365.Ai Bundle",
+  "description": "The most powerful configuration: MV900 hardware on each press/forming machine for real-time process monitoring and defect detection, feeding data into Machine365.Ai cloud platform for integrated energy management, AI analytics, and ESG reporting.",
+  "synergies": [
+    "MV900 captures real-time sensor data → Machine365.Ai analyzes trends across all equipment",
+    "MV900 detects defects at machine level → Machine365.Ai tracks defect patterns across factory",
+    "MV900 monitors press force per unit → Machine365.Ai calculates energy and carbon per product",
+    "MV900 enables emergency shutdown → Machine365.Ai provides predictive maintenance to prevent shutdowns"
+  ],
+  "ideal_customer_profile": {
+    "industry": "Metal forming, stamping, forging, pressing, automotive parts, copper/brass fittings",
+    "factory_size": "10+ press machines or forming equipment",
+    "pain_points": [
+      "High energy costs with no visibility into consumption per product",
+      "Frequent defects or mold damage causing production delays",
+      "ESG compliance requirements (especially EU regulations)",
+      "No real-time visibility into equipment status",
+      "High maintenance costs from reactive (not predictive) maintenance",
+      "Manual production tracking and reporting"
+    ],
+    "typical_roi": {
+      "energy_savings": "15-30% reduction in electricity costs",
+      "defect_reduction": "Up to 40% fewer defective products",
+      "downtime_reduction": "25-50% less unplanned downtime",
+      "mold_life": "20-35% extension in mold lifespan",
+      "maintenance": "30-40% reduction in maintenance costs"
+    }
+  }
+}

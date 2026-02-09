@@ -1,0 +1,37 @@
+{
+  "name": "Machine365.Ai",
+  "category": "Integrated Equipment Monitoring Platform (Software)",
+  "tagline": "Integrated Equipment Monitoring Solution for Achieving ESG",
+  "description": "Machine365.Ai is an integrated equipment monitoring system that captures real-time production data — power usage, output, and PLC signals — to deliver complete visibility into operations. With instant alerts on anomalies, it empowers factories to act fast, minimize downtime, and maximize performance.",
+  "key_features": [
+    "Integrated Equipment Management — manage all equipment in a single system",
+    "AI & ML-Based Analysis — anomaly detection and predictive maintenance",
+    "Flexible Installation & Scalability — works with older equipment via sensors/gateways",
+    "Easy Accessibility — browser-based, works on PC/tablet/mobile, no software install",
+    "Automatic updates — always up-to-date with zero manual work"
+  ],
+  "key_functions": {
+    "ai_power_monitoring": "Real-time and monthly cumulative power consumption by equipment or panel. Real-time peak monitoring for power management.",
+    "ai_electricity_cost": "Real-time KEPCO electricity rates. Usage and cost trend analysis by load time periods.",
+    "energy_monitoring": "Energy consumption per product measurement. Cross-equipment comparison.",
+    "carbon_emission_monitoring": "Automatic carbon emission calculation to support climate change reduction efforts.",
+    "ai_power_quality": "Real-time voltage, current, reactive power, power factor monitoring. Alerts on abnormal patterns.",
+    "ai_defect_detection": "Defect identification with root cause analysis. Alerts on exact defect timing. Defect prediction via press force trend analysis.",
+    "operational_status": "Operating and downtime visualization per machine. Operation/stop time tracking. Defect detection timestamps with MV integration.",
+    "production_monitoring": "Production speed trends. Products per minute (SPM). Average SPM and energy consumption per product.",
+    "plc_data_monitoring": "PLC data: bearing temperature, production quantity, SPM. Alerts on PLC abnormalities."
+  },
+  "implementation_benefits": {
+    "esg": "Automatic power consumption and carbon emission calculation. ESG report indicators.",
+    "downtime_reduction": "Equipment downtime notifications. Defect and anomaly alerts.",
+    "cost_reduction": "Peak power advance alerts. AI-powered electricity cost forecasting.",
+    "production_optimization": "Weekly/monthly production analysis reports. Equipment status history.",
+    "quality_improvement": "Press force peak trend analysis. Defect detection history tracking."
+  },
+  "best_for": [
+    "Any manufacturing facility wanting energy cost reduction",
+    "Factories needing ESG compliance and carbon tracking",
+    "Operations with multiple equipment types needing unified monitoring",
+    "Legacy factories wanting to retrofit smart monitoring without replacing equipment"
+  ]
+}

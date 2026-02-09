@@ -62,15 +62,15 @@ python run.py proposal "Koelle GmbH, Germany"
 ```
 
 **What to watch for:**
-1. `📚 RAG initialized: 16 total chunks` — ChromaDB loaded
-2. `🤖 Agent: Agentic Researcher` — multi-turn research starts
-3. `🔧 Tool: query_knowledge_base(...)` — KB queries
-4. `🔧 Tool: search_web(...)` — DuckDuckGo searches
-5. `🔧 Tool: scrape_company_website(...)` — website scraping
-6. `✅ Research complete (... tokens, N turns)` — research done
-7. `🤖 Agent: Solution Architect` — solution mapping
-8. `🤖 Agent: Proposal Writer` — proposal generation
-9. `✅ PIPELINE COMPLETE` — output saved
+1. `RAG: RAG initialized: 16 total chunks` — ChromaDB loaded
+2. `Agent: Agentic Researcher` — multi-turn research starts
+3. `Tool: query_knowledge_base(...)` — KB queries
+4. `Tool: search_web(...)` — DuckDuckGo searches
+5. `Tool: scrape_company_website(...)` — website scraping
+6. `Research complete (... tokens, N turns)` — research done
+7. `Agent: Solution Architect` — solution mapping
+8. `Agent: Proposal Writer` — proposal generation
+9. `PIPELINE COMPLETE` — output saved
 
 **Output:** Check `outputs/proposal_Koelle_GmbH_*.md` for the full proposal.
 
@@ -223,6 +223,6 @@ print(f'Tool dispatch: {result[:80]}...')
 # 5. Tools registered
 print(f'Tools: {[t[\"name\"] for t in RESEARCHER_TOOLS]}')
 
-print('\n✅ All systems operational')
+print('\\nAll systems operational')
 "
 ```

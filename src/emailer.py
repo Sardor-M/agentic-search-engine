@@ -47,7 +47,7 @@ def parse_email_text(email_text: str) -> dict:
     if match:
         subject = match.group(1).strip()
         # Body is everything after "Subject: ...\n\n"
-        body = email_text.strip()[match.end():].strip()
+        body = email_text.strip()[match.end() :].strip()
 
     return {"subject": subject, "body": body}
 

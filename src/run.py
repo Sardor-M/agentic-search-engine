@@ -9,9 +9,9 @@ Usage:
     python run.py --example                                    # example menu
 """
 
-import sys
-import os
 import json
+import os
+import sys
 from datetime import datetime
 from pathlib import Path
 
@@ -22,17 +22,20 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 OUTPUTS_DIR = str(PROJECT_ROOT / "outputs")
 
 from agents import (
-    run_pipeline,
-    run_researcher,
     run_deal_estimator,
     run_email_writer,
+    run_pipeline,
+    run_researcher,
 )
+from emailer import is_configured as gmail_configured
+from emailer import parse_email_text, send_outreach_email
 from prospector import find_prospects, format_prospect_for_agent
-from emailer import send_outreach_email, is_configured as gmail_configured, parse_email_text
 
 # RAG knowledge base (optional — pipeline works without it)
 try:
-    from rag import initialize as init_rag, index_new_outreach
+    from rag import index_new_outreach
+    from rag import initialize as init_rag
+
     RAG_AVAILABLE = True
 except ImportError:
     RAG_AVAILABLE = False
@@ -41,6 +44,7 @@ except ImportError:
 try:
     from rich.console import Console
     from rich.table import Table
+
     RICH_AVAILABLE = True
 except ImportError:
     RICH_AVAILABLE = False
@@ -85,6 +89,7 @@ EXAMPLE_PROSPECTS = [
 # ─────────────────────────────────────────────
 # Search & Outreach Pipeline
 # ─────────────────────────────────────────────
+
 
 def _parse_deal_json(raw: str) -> dict:
     """Safely parse deal estimator JSON output."""
@@ -138,20 +143,24 @@ def _display_table(prospects: list[dict], deals: list[dict]):
         console.print(table)
     else:
         # Plain text fallback
-        print(f"\n{'#':<4} {'Company':<30} {'Industry':<20} {'Email':<30} {'Est. Deal':>12} {'Category':<10}")
+        print(
+            f"\n{'#':<4} {'Company':<30} {'Industry':<20} {'Email':<30} {'Est. Deal':>12} {'Category':<10}"
+        )
         print("-" * 110)
         for i, (p, d) in enumerate(zip(prospects, deals)):
             email = p["emails"][0] if p["emails"] else "—"
             value = f"${d.get('first_year_value', 0):,.0f}"
-            print(f"{i+1:<4} {p['title'][:30]:<30} {d.get('industry', '—')[:20]:<20} {email:<30} {value:>12} {d.get('deal_category', '—'):<10}")
+            print(
+                f"{i + 1:<4} {p['title'][:30]:<30} {d.get('industry', '—')[:20]:<20} {email:<30} {value:>12} {d.get('deal_category', '—'):<10}"
+            )
 
 
 def _get_user_selection(count: int) -> list[int]:
     """Ask user which prospects to pursue. Returns 0-indexed list."""
-    print(f"\nSelect prospects to pursue:")
-    print(f"  Enter numbers separated by commas (e.g. 1,3,5)")
-    print(f"  'all' to select all")
-    print(f"  'q' to quit")
+    print("\nSelect prospects to pursue:")
+    print("  Enter numbers separated by commas (e.g. 1,3,5)")
+    print("  'all' to select all")
+    print("  'q' to quit")
 
     choice = input("\n> ").strip().lower()
 
@@ -189,7 +198,7 @@ def search_command(query: str):
     print(f"Started: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
 
     # ── Step 1-2: Find prospects ──
-    print(f"\n--- Step 1: Finding companies ---")
+    print("\n--- Step 1: Finding companies ---")
     prospects = find_prospects(query, max_results=10, search_delay=1.0)
 
     if not prospects:
@@ -197,7 +206,7 @@ def search_command(query: str):
         return
 
     # ── Step 3: Estimate deals ──
-    print(f"\n--- Step 2: Estimating deal sizes ---")
+    print("\n--- Step 2: Estimating deal sizes ---")
     deals = []
     for p in prospects:
         brief = format_prospect_for_agent(p)
@@ -206,7 +215,7 @@ def search_command(query: str):
         deals.append(deal)
 
     # ── Step 4: Display table ──
-    print(f"\n--- Step 3: Results ---")
+    print("\n--- Step 3: Results ---")
     _display_table(prospects, deals)
 
     # ── Step 5: User selection ──
@@ -223,9 +232,9 @@ def search_command(query: str):
     # ── Step 6-7: Research + Write emails ──
     outreach_results = []
     for i, (prospect, deal) in enumerate(zip(selected_prospects, selected_deals)):
-        print(f"\n{'─'*60}")
-        print(f"  Prospect {i+1}/{len(selected_prospects)}: {prospect['title']}")
-        print(f"{'─'*60}")
+        print(f"\n{'─' * 60}")
+        print(f"  Prospect {i + 1}/{len(selected_prospects)}: {prospect['title']}")
+        print(f"{'─' * 60}")
 
         # Research
         brief = format_prospect_for_agent(prospect)
@@ -237,32 +246,34 @@ def search_command(query: str):
 
         to_email = prospect["emails"][0] if prospect["emails"] else None
 
-        outreach_results.append({
-            "prospect": prospect,
-            "deal": deal,
-            "research": research,
-            "email_text": email_text,
-            "to_email": to_email,
-        })
+        outreach_results.append(
+            {
+                "prospect": prospect,
+                "deal": deal,
+                "research": research,
+                "email_text": email_text,
+                "to_email": to_email,
+            }
+        )
 
     # ── Step 8: Preview emails ──
-    print(f"\n{'='*60}")
+    print(f"\n{'=' * 60}")
     print("  EMAIL PREVIEWS")
-    print(f"{'='*60}")
+    print(f"{'=' * 60}")
 
     for i, result in enumerate(outreach_results):
         to = result["to_email"] or "(no email found)"
-        print(f"\n--- Email {i+1}: {result['prospect']['title'][:40]} → {to} ---")
+        print(f"\n--- Email {i + 1}: {result['prospect']['title'][:40]} → {to} ---")
         print(result["email_text"])
         print()
 
     # ── Step 8.5: Fill in missing emails ──
     missing = [r for r in outreach_results if not r["to_email"]]
     if missing:
-        print(f"\n{'─'*60}")
+        print(f"\n{'─' * 60}")
         print(f"  {len(missing)} prospect(s) have no email address.")
-        print(f"  You can enter emails manually, or press Enter to skip each.")
-        print(f"{'─'*60}")
+        print("  You can enter emails manually, or press Enter to skip each.")
+        print(f"{'─' * 60}")
 
         for result in missing:
             name = result["prospect"]["title"][:40]
@@ -272,21 +283,21 @@ def search_command(query: str):
                 print(f"    Set: {addr}")
             else:
                 if addr:
-                    print(f"    Skipped (invalid)")
+                    print("    Skipped (invalid)")
                 else:
-                    print(f"    Skipped")
+                    print("    Skipped")
 
     # ── Step 9: Send emails ──
     sent_count = 0
     sendable = [r for r in outreach_results if r["to_email"]]
 
     if sendable:
-        print(f"\n{'='*60}")
+        print(f"\n{'=' * 60}")
         print(f"  READY TO SEND ({len(sendable)} emails)")
-        print(f"{'='*60}")
+        print(f"{'=' * 60}")
         for i, r in enumerate(sendable):
             parsed = parse_email_text(r["email_text"])
-            print(f"  {i+1}. {r['prospect']['title'][:35]} → {r['to_email']}")
+            print(f"  {i + 1}. {r['prospect']['title'][:35]} → {r['to_email']}")
             print(f"     Subject: {parsed['subject']}")
 
         if gmail_configured():
@@ -324,16 +335,18 @@ def search_command(query: str):
 
     for result in outreach_results:
         parsed = parse_email_text(result["email_text"])
-        output_data["prospects"].append({
-            "company": result["prospect"]["title"],
-            "url": result["prospect"]["url"],
-            "email": result["to_email"],
-            "deal_estimate": result["deal"],
-            "research_brief": result["research"],
-            "email_subject": parsed["subject"],
-            "email_body": parsed["body"],
-            "sent": result["to_email"] in sent_emails if result["to_email"] else False,
-        })
+        output_data["prospects"].append(
+            {
+                "company": result["prospect"]["title"],
+                "url": result["prospect"]["url"],
+                "email": result["to_email"],
+                "deal_estimate": result["deal"],
+                "research_brief": result["research"],
+                "email_subject": parsed["subject"],
+                "email_body": parsed["body"],
+                "sent": result["to_email"] in sent_emails if result["to_email"] else False,
+            }
+        )
 
     output_path = os.path.join(OUTPUTS_DIR, f"outreach_{timestamp}.json")
     with open(output_path, "w") as f:
@@ -343,9 +356,9 @@ def search_command(query: str):
     if RAG_AVAILABLE:
         try:
             rag_status = index_new_outreach(output_data)
-            print(f"📚 {rag_status}")
+            print(f"RAG: {rag_status}")
         except Exception as e:
-            print(f"⚠️ RAG indexing skipped: {e}")
+            print(f"Warning: RAG indexing skipped: {e}")
 
     print(f"\nResults saved: {output_path}")
     print(f"Finished: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
@@ -354,6 +367,7 @@ def search_command(query: str):
 # ─────────────────────────────────────────────
 # Legacy Modes (preserved)
 # ─────────────────────────────────────────────
+
 
 def interactive_mode():
     """Run in interactive mode — ask user for company details."""
@@ -396,7 +410,7 @@ def example_mode():
         print(f"\n  [{i + 1}] {prospect['name']}")
         print(f"      {prospect['input'][:80]}...")
 
-    print(f"\n  [0] Enter custom company")
+    print("\n  [0] Enter custom company")
 
     choice = input("\nSelect a prospect (1-3, or 0 for custom): ").strip()
 
@@ -421,15 +435,16 @@ def example_mode():
 # Main
 # ─────────────────────────────────────────────
 
+
 def _init_rag_safe():
     """Initialize RAG knowledge base. Fails silently if unavailable."""
     if not RAG_AVAILABLE:
         return
     try:
         status = init_rag()
-        print(f"📚 {status}")
+        print(f"RAG: {status}")
     except Exception as e:
-        print(f"⚠️ RAG init skipped: {e}")
+        print(f"Warning: RAG init skipped: {e}")
 
 
 def main():
@@ -443,14 +458,14 @@ def main():
 
     if command == "search":
         if len(sys.argv) < 3:
-            print("Usage: python run.py search \"metal stamping companies Germany\"")
+            print('Usage: python run.py search "metal stamping companies Germany"')
             return
         query = " ".join(sys.argv[2:])
         search_command(query)
 
     elif command == "proposal":
         if len(sys.argv) < 3:
-            print("Usage: python run.py proposal \"Company name, Country\"")
+            print('Usage: python run.py proposal "Company name, Country"')
             return
         company_input = " ".join(sys.argv[2:])
         result = run_pipeline(company_input)

@@ -10,7 +10,6 @@ import time
 
 from ddgs import DDGS
 
-
 # Email regex — catches common patterns in search snippets
 EMAIL_RE = re.compile(
     r"[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}",
@@ -23,45 +22,84 @@ PHONE_RE = re.compile(
 
 # Generic / junk emails to skip
 JUNK_DOMAINS = {
-    "example.com", "sentry.io", "wixpress.com", "googleapis.com",
-    "google.com", "facebook.com", "twitter.com", "schema.org",
-    "youtube.com", "instagram.com", "linkedin.com", "tiktok.com",
+    "example.com",
+    "sentry.io",
+    "wixpress.com",
+    "googleapis.com",
+    "google.com",
+    "facebook.com",
+    "twitter.com",
+    "schema.org",
+    "youtube.com",
+    "instagram.com",
+    "linkedin.com",
+    "tiktok.com",
 }
 
 # Domains that are never real company websites
 IRRELEVANT_DOMAINS = {
     # Social media / general
-    "wikipedia.org", "youtube.com", "tiktok.com", "pinterest.com",
-    "facebook.com", "instagram.com", "reddit.com", "twitter.com",
-    "x.com", "linkedin.com", "amazon.com", "ebay.com", "alibaba.com",
-    "apple.com", "developer.apple.com", "google.com", "yelp.com",
-    "glassdoor.com", "indeed.com", "quora.com", "medium.com",
-    "bbb.org", "trustpilot.com",
+    "wikipedia.org",
+    "youtube.com",
+    "tiktok.com",
+    "pinterest.com",
+    "facebook.com",
+    "instagram.com",
+    "reddit.com",
+    "twitter.com",
+    "x.com",
+    "linkedin.com",
+    "amazon.com",
+    "ebay.com",
+    "alibaba.com",
+    "apple.com",
+    "developer.apple.com",
+    "google.com",
+    "yelp.com",
+    "glassdoor.com",
+    "indeed.com",
+    "quora.com",
+    "medium.com",
+    "bbb.org",
+    "trustpilot.com",
     # Directory / listing / market research sites
-    "thomasnet.com", "iqsdirectory.com", "globalspec.com",
-    "mordorintelligence.com", "grandviewresearch.com", "statista.com",
-    "ibisworld.com", "dnb.com", "zoominfo.com", "crunchbase.com",
-    "ensun.com", "inven.ai", "marketsandmarkets.com",
-    "made-in-china.com", "globalsources.com", "indiamart.com",
-    "europages.com", "kompass.com", "yellowpages.com",
+    "thomasnet.com",
+    "iqsdirectory.com",
+    "globalspec.com",
+    "mordorintelligence.com",
+    "grandviewresearch.com",
+    "statista.com",
+    "ibisworld.com",
+    "dnb.com",
+    "zoominfo.com",
+    "crunchbase.com",
+    "ensun.com",
+    "inven.ai",
+    "marketsandmarkets.com",
+    "made-in-china.com",
+    "globalsources.com",
+    "indiamart.com",
+    "europages.com",
+    "kompass.com",
+    "yellowpages.com",
 }
 
 # Title patterns that indicate directory/listing pages, not real companies
 DIRECTORY_PATTERNS = re.compile(
     r"(?i)"
-    r"(^top\s+\d+\s)"            # "Top 100 ..."
-    r"|(best\s+\d+\s)"           # "Best 10 ..."
-    r"|(\d+\s+best\s)"           # "10 Best ..."
-    r"|(companies\s+in\s)"       # "Companies in Germany"
-    r"|(market\s+size)"          # "Market Size & Outlook"
-    r"|(market\s+report)"        # "Market Report"
-    r"|(companies\s+list)"       # "Companies List"
+    r"(^top\s+\d+\s)"  # "Top 100 ..."
+    r"|(best\s+\d+\s)"  # "Best 10 ..."
+    r"|(\d+\s+best\s)"  # "10 Best ..."
+    r"|(companies\s+in\s)"  # "Companies in Germany"
+    r"|(market\s+size)"  # "Market Size & Outlook"
+    r"|(market\s+report)"  # "Market Report"
+    r"|(companies\s+list)"  # "Companies List"
     r"|(manufacturers\s*&\s*suppliers)"  # "Manufacturers & Suppliers"
-    r"|(manufacturers,\s*factories)"     # "Manufacturers, Factories"
-    r"|(manufacturers\s+and\s+suppliers)" # "Manufacturers and Suppliers"
-    r"|(\|\s*b2b\s)"                     # "| B2B companies"
-    r"|(suppliers\s+in\s+\w+$)"          # "Suppliers in Germany"
-    r"|(buy\s+or\s+sell)"                # "Buy or Sell a Business"
+    r"|(manufacturers,\s*factories)"  # "Manufacturers, Factories"
+    r"|(manufacturers\s+and\s+suppliers)"  # "Manufacturers and Suppliers"
+    r"|(\|\s*b2b\s)"  # "| B2B companies"
+    r"|(suppliers\s+in\s+\w+$)"  # "Suppliers in Germany"
+    r"|(buy\s+or\s+sell)"  # "Buy or Sell a Business"
 )
 
 
@@ -116,7 +154,10 @@ def search_companies(query: str, max_results: int = 10) -> list[dict]:
     # Enhance query for manufacturing-specific results
     q_lower = query.lower()
     enhanced = query
-    if not any(w in q_lower for w in ["manufacturer", "company", "factory", "supplier", "gmbh", "inc", "ltd", "corp"]):
+    if not any(
+        w in q_lower
+        for w in ["manufacturer", "company", "factory", "supplier", "gmbh", "inc", "ltd", "corp"]
+    ):
         enhanced = f"{query} manufacturer company"
 
     print(f"\n  Searching DuckDuckGo: '{enhanced}'")
@@ -145,12 +186,14 @@ def search_companies(query: str, max_results: int = 10) -> list[dict]:
             continue
         seen_domains.add(domain)
 
-        companies.append({
-            "title": title,
-            "url": url,
-            "snippet": snippet,
-            "domain": domain,
-        })
+        companies.append(
+            {
+                "title": title,
+                "url": url,
+                "snippet": snippet,
+                "domain": domain,
+            }
+        )
 
         if len(companies) >= max_results:
             break
@@ -187,8 +230,10 @@ def enrich_contacts(companies: list[dict], delay: float = 1.0) -> list[dict]:
         company["emails"] = _extract_emails(combined_text)
         company["phones"] = _extract_phones(combined_text)
 
-        print(f"    [{i+1}/{len(companies)}] {name[:40]} — "
-              f"{len(company['emails'])} emails, {len(company['phones'])} phones")
+        print(
+            f"    [{i + 1}/{len(companies)}] {name[:40]} — "
+            f"{len(company['emails'])} emails, {len(company['phones'])} phones"
+        )
 
         if delay and i < len(companies) - 1:
             time.sleep(delay)

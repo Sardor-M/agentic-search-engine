@@ -8,17 +8,17 @@ Indexes:
 Provides semantic search via query_knowledge_base().
 """
 
-import os
-import json
 import glob
+import json
+import os
 from pathlib import Path
 
 from knowledge import (
-    COMPANY_PROFILE,
-    MV900_KNOWLEDGE,
-    MACHINE365_KNOWLEDGE,
-    COMBINED_SOLUTION,
     CASE_STUDIES,
+    COMBINED_SOLUTION,
+    COMPANY_PROFILE,
+    MACHINE365_KNOWLEDGE,
+    MV900_KNOWLEDGE,
 )
 
 # Paths
@@ -37,152 +37,159 @@ def _build_product_chunks() -> list[dict]:
     chunks = []
 
     # Company profile
-    chunks.append({
-        "id": "company_profile",
-        "text": f"3View Company Profile: {COMPANY_PROFILE.strip()}",
-        "metadata": {"source": "knowledge", "category": "company"},
-    })
+    chunks.append(
+        {
+            "id": "company_profile",
+            "text": f"3View Company Profile: {COMPANY_PROFILE.strip()}",
+            "metadata": {"source": "knowledge", "category": "company"},
+        }
+    )
 
     # MV900 overview
-    chunks.append({
-        "id": "mv900_overview",
-        "text": (
-            f"MV900 — {MV900_KNOWLEDGE['tagline']}. "
-            f"{MV900_KNOWLEDGE['description']} "
-            f"Category: {MV900_KNOWLEDGE['category']}. "
-            f"Best for: {', '.join(MV900_KNOWLEDGE['best_for'])}."
-        ),
-        "metadata": {"source": "knowledge", "category": "mv900"},
-    })
+    chunks.append(
+        {
+            "id": "mv900_overview",
+            "text": (
+                f"MV900 — {MV900_KNOWLEDGE['tagline']}. "
+                f"{MV900_KNOWLEDGE['description']} "
+                f"Category: {MV900_KNOWLEDGE['category']}. "
+                f"Best for: {', '.join(MV900_KNOWLEDGE['best_for'])}."
+            ),
+            "metadata": {"source": "knowledge", "category": "mv900"},
+        }
+    )
 
     # MV900 features
-    chunks.append({
-        "id": "mv900_features",
-        "text": (
-            "MV900 Key Features: "
-            + ". ".join(MV900_KNOWLEDGE["key_features"])
-        ),
-        "metadata": {"source": "knowledge", "category": "mv900"},
-    })
+    chunks.append(
+        {
+            "id": "mv900_features",
+            "text": ("MV900 Key Features: " + ". ".join(MV900_KNOWLEDGE["key_features"])),
+            "metadata": {"source": "knowledge", "category": "mv900"},
+        }
+    )
 
     # MV900 functions
-    chunks.append({
-        "id": "mv900_functions",
-        "text": (
-            "MV900 Key Functions: "
-            + ". ".join(MV900_KNOWLEDGE["key_functions"])
-        ),
-        "metadata": {"source": "knowledge", "category": "mv900"},
-    })
+    chunks.append(
+        {
+            "id": "mv900_functions",
+            "text": ("MV900 Key Functions: " + ". ".join(MV900_KNOWLEDGE["key_functions"])),
+            "metadata": {"source": "knowledge", "category": "mv900"},
+        }
+    )
 
     # MV900 benefits
-    chunks.append({
-        "id": "mv900_benefits",
-        "text": (
-            "MV900 Expected Benefits: "
-            + ". ".join(MV900_KNOWLEDGE["expected_benefits"])
-        ),
-        "metadata": {"source": "knowledge", "category": "mv900"},
-    })
+    chunks.append(
+        {
+            "id": "mv900_benefits",
+            "text": ("MV900 Expected Benefits: " + ". ".join(MV900_KNOWLEDGE["expected_benefits"])),
+            "metadata": {"source": "knowledge", "category": "mv900"},
+        }
+    )
 
     # MV900 specs
-    specs_str = ", ".join(
-        f"{k}: {v}" for k, v in MV900_KNOWLEDGE["specs"].items()
+    specs_str = ", ".join(f"{k}: {v}" for k, v in MV900_KNOWLEDGE["specs"].items())
+    chunks.append(
+        {
+            "id": "mv900_specs",
+            "text": f"MV900 Hardware Specifications: {specs_str}",
+            "metadata": {"source": "knowledge", "category": "mv900"},
+        }
     )
-    chunks.append({
-        "id": "mv900_specs",
-        "text": f"MV900 Hardware Specifications: {specs_str}",
-        "metadata": {"source": "knowledge", "category": "mv900"},
-    })
 
     # Machine365.Ai overview
-    chunks.append({
-        "id": "machine365_overview",
-        "text": (
-            f"Machine365.Ai — {MACHINE365_KNOWLEDGE['tagline']}. "
-            f"{MACHINE365_KNOWLEDGE['description']} "
-            f"Category: {MACHINE365_KNOWLEDGE['category']}. "
-            f"Best for: {', '.join(MACHINE365_KNOWLEDGE['best_for'])}."
-        ),
-        "metadata": {"source": "knowledge", "category": "machine365"},
-    })
+    chunks.append(
+        {
+            "id": "machine365_overview",
+            "text": (
+                f"Machine365.Ai — {MACHINE365_KNOWLEDGE['tagline']}. "
+                f"{MACHINE365_KNOWLEDGE['description']} "
+                f"Category: {MACHINE365_KNOWLEDGE['category']}. "
+                f"Best for: {', '.join(MACHINE365_KNOWLEDGE['best_for'])}."
+            ),
+            "metadata": {"source": "knowledge", "category": "machine365"},
+        }
+    )
 
     # Machine365 features
-    chunks.append({
-        "id": "machine365_features",
-        "text": (
-            "Machine365.Ai Key Features: "
-            + ". ".join(MACHINE365_KNOWLEDGE["key_features"])
-        ),
-        "metadata": {"source": "knowledge", "category": "machine365"},
-    })
+    chunks.append(
+        {
+            "id": "machine365_features",
+            "text": (
+                "Machine365.Ai Key Features: " + ". ".join(MACHINE365_KNOWLEDGE["key_features"])
+            ),
+            "metadata": {"source": "knowledge", "category": "machine365"},
+        }
+    )
 
     # Machine365 functions — group them into one chunk
-    funcs_text = ". ".join(
-        f"{k}: {v}"
-        for k, v in MACHINE365_KNOWLEDGE["key_functions"].items()
+    funcs_text = ". ".join(f"{k}: {v}" for k, v in MACHINE365_KNOWLEDGE["key_functions"].items())
+    chunks.append(
+        {
+            "id": "machine365_functions",
+            "text": f"Machine365.Ai Key Functions: {funcs_text}",
+            "metadata": {"source": "knowledge", "category": "machine365"},
+        }
     )
-    chunks.append({
-        "id": "machine365_functions",
-        "text": f"Machine365.Ai Key Functions: {funcs_text}",
-        "metadata": {"source": "knowledge", "category": "machine365"},
-    })
 
     # Machine365 implementation benefits
     benefits_text = ". ".join(
-        f"{k}: {v}"
-        for k, v in MACHINE365_KNOWLEDGE["implementation_benefits"].items()
+        f"{k}: {v}" for k, v in MACHINE365_KNOWLEDGE["implementation_benefits"].items()
     )
-    chunks.append({
-        "id": "machine365_benefits",
-        "text": f"Machine365.Ai Implementation Benefits: {benefits_text}",
-        "metadata": {"source": "knowledge", "category": "machine365"},
-    })
+    chunks.append(
+        {
+            "id": "machine365_benefits",
+            "text": f"Machine365.Ai Implementation Benefits: {benefits_text}",
+            "metadata": {"source": "knowledge", "category": "machine365"},
+        }
+    )
 
     # Combined solution
     synergies = ". ".join(COMBINED_SOLUTION["synergies"])
-    chunks.append({
-        "id": "combined_solution",
-        "text": (
-            f"Combined MV900 + Machine365.Ai Solution: "
-            f"{COMBINED_SOLUTION['description']} "
-            f"Synergies: {synergies}"
-        ),
-        "metadata": {"source": "knowledge", "category": "combined"},
-    })
+    chunks.append(
+        {
+            "id": "combined_solution",
+            "text": (
+                f"Combined MV900 + Machine365.Ai Solution: "
+                f"{COMBINED_SOLUTION['description']} "
+                f"Synergies: {synergies}"
+            ),
+            "metadata": {"source": "knowledge", "category": "combined"},
+        }
+    )
 
     # Ideal customer profile + ROI
-    pain_points = ". ".join(
-        COMBINED_SOLUTION["ideal_customer_profile"]["pain_points"]
-    )
+    pain_points = ". ".join(COMBINED_SOLUTION["ideal_customer_profile"]["pain_points"])
     roi_text = ". ".join(
-        f"{k}: {v}"
-        for k, v in COMBINED_SOLUTION["ideal_customer_profile"]["typical_roi"].items()
+        f"{k}: {v}" for k, v in COMBINED_SOLUTION["ideal_customer_profile"]["typical_roi"].items()
     )
-    chunks.append({
-        "id": "ideal_customer",
-        "text": (
-            f"Ideal Customer Profile — "
-            f"Industry: {COMBINED_SOLUTION['ideal_customer_profile']['industry']}. "
-            f"Factory size: {COMBINED_SOLUTION['ideal_customer_profile']['factory_size']}. "
-            f"Pain points: {pain_points}. "
-            f"Typical ROI: {roi_text}."
-        ),
-        "metadata": {"source": "knowledge", "category": "sales"},
-    })
+    chunks.append(
+        {
+            "id": "ideal_customer",
+            "text": (
+                f"Ideal Customer Profile — "
+                f"Industry: {COMBINED_SOLUTION['ideal_customer_profile']['industry']}. "
+                f"Factory size: {COMBINED_SOLUTION['ideal_customer_profile']['factory_size']}. "
+                f"Pain points: {pain_points}. "
+                f"Typical ROI: {roi_text}."
+            ),
+            "metadata": {"source": "knowledge", "category": "sales"},
+        }
+    )
 
     # Case studies — one chunk per study
     for i, cs in enumerate(CASE_STUDIES):
-        chunks.append({
-            "id": f"case_study_{i}",
-            "text": (
-                f"Case Study: {cs['title']}. "
-                f"Solution: {cs['solution']}. "
-                f"Result: {cs['result']}. "
-                f"Tags: {', '.join(cs['tags'])}."
-            ),
-            "metadata": {"source": "knowledge", "category": "case_study"},
-        })
+        chunks.append(
+            {
+                "id": f"case_study_{i}",
+                "text": (
+                    f"Case Study: {cs['title']}. "
+                    f"Solution: {cs['solution']}. "
+                    f"Result: {cs['result']}. "
+                    f"Tags: {', '.join(cs['tags'])}."
+                ),
+                "metadata": {"source": "knowledge", "category": "case_study"},
+            }
+        )
 
     return chunks
 
@@ -220,16 +227,18 @@ def _load_outreach_chunks() -> list[dict]:
                 f"Email sent: {sent}. Search query: {query}. "
                 f"Research brief: {brief}"
             )
-            chunks.append({
-                "id": chunk_id,
-                "text": text,
-                "metadata": {
-                    "source": "outreach",
-                    "category": "past_outreach",
-                    "company": company,
-                    "timestamp": timestamp,
-                },
-            })
+            chunks.append(
+                {
+                    "id": chunk_id,
+                    "text": text,
+                    "metadata": {
+                        "source": "outreach",
+                        "category": "past_outreach",
+                        "company": company,
+                        "timestamp": timestamp,
+                    },
+                }
+            )
 
     return chunks
 
@@ -305,14 +314,10 @@ def query_knowledge_base(query: str, n_results: int = 3) -> str:
         return "No relevant results found."
 
     output_parts = []
-    for i, (doc, meta) in enumerate(
-        zip(results["documents"][0], results["metadatas"][0])
-    ):
+    for i, (doc, meta) in enumerate(zip(results["documents"][0], results["metadatas"][0])):
         source = meta.get("source", "unknown")
         category = meta.get("category", "unknown")
-        output_parts.append(
-            f"[Result {i+1}] (source: {source}, category: {category})\n{doc}"
-        )
+        output_parts.append(f"[Result {i + 1}] (source: {source}, category: {category})\n{doc}")
 
     return "\n\n".join(output_parts)
 
@@ -357,12 +362,14 @@ def index_new_outreach(data: dict) -> str:
             _collection.add(
                 ids=[chunk_id],
                 documents=[text],
-                metadatas=[{
-                    "source": "outreach",
-                    "category": "past_outreach",
-                    "company": company,
-                    "timestamp": timestamp,
-                }],
+                metadatas=[
+                    {
+                        "source": "outreach",
+                        "category": "past_outreach",
+                        "company": company,
+                        "timestamp": timestamp,
+                    }
+                ],
             )
             indexed += 1
         except Exception:

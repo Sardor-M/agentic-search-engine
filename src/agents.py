@@ -10,20 +10,17 @@ Agents:
 5. Cold Email Writer - writes personalized cold outreach emails
 """
 
-import os
 import json
+import os
 import re
 import time
 from datetime import datetime
-from typing import Optional
 from pathlib import Path
 
-from dotenv import load_dotenv
 from anthropic import Anthropic, APIError
+from dotenv import load_dotenv
 
-from pathlib import Path
-
-from knowledge import get_full_product_context, COMBINED_SOLUTION, COMPANY_PROFILE
+from knowledge import COMPANY_PROFILE, get_full_product_context
 from prospector import search_companies
 from scraper import scrape_website
 
@@ -45,11 +42,11 @@ def call_agent(
     temperature: float = 0.7,
 ) -> str:
     """Call Claude API as a specific agent."""
-    print(f"\n{'='*60}")
-    print(f"🤖 Agent: {agent_name}")
-    print(f"{'='*60}")
-    print(f"📨 Task: {user_message[:120]}...")
-    print(f"⏳ Working...")
+    print(f"\n{'=' * 60}")
+    print(f"Agent: {agent_name}")
+    print(f"{'=' * 60}")
+    print(f"Task: {user_message[:120]}...")
+    print("Working...")
 
     max_retries = 3
     for attempt in range(max_retries):
@@ -64,26 +61,30 @@ def call_agent(
             result = response.content[0].text
             tokens_in = response.usage.input_tokens
             tokens_out = response.usage.output_tokens
-            print(f"✅ Done ({tokens_in} in / {tokens_out} out tokens)")
+            print(f"Done ({tokens_in} in / {tokens_out} out tokens)", flush=True)
             return result
         except APIError as e:
             error_msg = str(e)
             if "rate_limit" in error_msg.lower() or "overloaded" in error_msg.lower():
-                wait = 2 ** attempt * 10  # 10s, 20s, 40s
+                wait = 2**attempt * 10  # 10s, 20s, 40s
                 if attempt < max_retries - 1:
-                    print(f"⏳ Rate limited. Waiting {wait}s before retry ({attempt+1}/{max_retries})...")
+                    print(
+                        f"Rate limited. Waiting {wait}s before retry ({attempt + 1}/{max_retries})..."
+                    )
                     time.sleep(wait)
                     continue
                 else:
-                    print(f"❌ Rate limit persists after {max_retries} retries. Try again in a few minutes.")
+                    print(
+                        f"Error: Rate limit persists after {max_retries} retries. Try again in a few minutes."
+                    )
                     raise SystemExit(1)
             elif "credit balance" in error_msg.lower() or "billing" in error_msg.lower():
-                print(f"❌ API billing error: Your Anthropic credit balance is too low.")
-                print(f"   Go to https://console.anthropic.com/settings/billing to add credits.")
+                print("Error: API billing — credit balance is too low.")
+                print("   Go to https://console.anthropic.com/settings/billing to add credits.")
             elif "authentication" in error_msg.lower() or "api_key" in error_msg.lower():
-                print(f"❌ API key invalid. Check ANTHROPIC_API_KEY in your .env file.")
+                print("Error: API key invalid. Check ANTHROPIC_API_KEY in your .env file.")
             else:
-                print(f"❌ API error: {error_msg}")
+                print(f"Error: API — {error_msg}")
             raise SystemExit(1)
     raise SystemExit(1)  # should not reach here
 
@@ -215,15 +216,14 @@ def _execute_tool(tool_name: str, tool_input: dict) -> str:
             return "No search results found."
         parts = []
         for r in results:
-            parts.append(
-                f"- {r['title']}\n  URL: {r['url']}\n  {r['snippet']}"
-            )
+            parts.append(f"- {r['title']}\n  URL: {r['url']}\n  {r['snippet']}")
         return "\n".join(parts)
 
     elif tool_name == "query_knowledge_base":
         query = tool_input.get("query", "")
         try:
             from rag import query_knowledge_base
+
             return query_knowledge_base(query, n_results=3)
         except Exception as e:
             return f"Knowledge base unavailable: {e}"
@@ -244,12 +244,12 @@ def call_agentic_researcher(company_input: str, max_turns: int = 5) -> str:
     Loops until the model returns a final text response (no more tool calls)
     or max_turns is reached.
     """
-    print(f"\n{'='*60}")
-    print(f"🤖 Agent: Agentic Researcher")
-    print(f"{'='*60}")
-    print(f"📨 Target: {company_input[:120]}...")
-    print(f"🔧 Tools: search_web, query_knowledge_base, scrape_company_website")
-    print(f"🔄 Max turns: {max_turns}")
+    print(f"\n{'=' * 60}")
+    print("Agent: Agentic Researcher")
+    print(f"{'=' * 60}")
+    print(f"Target: {company_input[:120]}...")
+    print("Tools: search_web, query_knowledge_base, scrape_company_website")
+    print(f"Max turns: {max_turns}")
 
     messages = [
         {
@@ -282,13 +282,13 @@ def call_agentic_researcher(company_input: str, max_turns: int = 5) -> str:
         except APIError as e:
             error_msg = str(e)
             if "credit balance" in error_msg.lower() or "billing" in error_msg.lower():
-                print(f"❌ API billing error: Your Anthropic credit balance is too low.")
+                print("Error: API billing — credit balance is too low.")
                 raise SystemExit(1)
             elif "authentication" in error_msg.lower() or "api_key" in error_msg.lower():
-                print(f"❌ API key invalid. Check ANTHROPIC_API_KEY in your .env file.")
+                print("Error: API key invalid. Check ANTHROPIC_API_KEY in your .env file.")
                 raise SystemExit(1)
             else:
-                print(f"❌ API error: {error_msg}")
+                print(f"Error: API — {error_msg}")
                 raise SystemExit(1)
 
         total_in += response.usage.input_tokens
@@ -303,19 +303,21 @@ def call_agentic_researcher(company_input: str, max_turns: int = 5) -> str:
                     tool_name = block.name
                     tool_input = block.input
                     tool_id = block.id
-                    print(f"  🔧 Tool: {tool_name}({json.dumps(tool_input)[:80]})")
+                    print(f"  Tool: {tool_name}({json.dumps(tool_input)[:80]})")
 
                     result = _execute_tool(tool_name, tool_input)
                     # Truncate very long results
                     if len(result) > 3000:
                         result = result[:3000] + "\n\n[...truncated]"
-                    print(f"  📋 Result: {result[:100]}...")
+                    print(f"  Result: {result[:100]}...")
 
-                    tool_results.append({
-                        "type": "tool_result",
-                        "tool_use_id": tool_id,
-                        "content": result,
-                    })
+                    tool_results.append(
+                        {
+                            "type": "tool_result",
+                            "tool_use_id": tool_id,
+                            "content": result,
+                        }
+                    )
 
             # Add assistant message + tool results to conversation
             messages.append({"role": "assistant", "content": response.content})
@@ -328,19 +330,21 @@ def call_agentic_researcher(company_input: str, max_turns: int = 5) -> str:
                 if hasattr(block, "text"):
                     final_text += block.text
 
-            print(f"\n✅ Research complete ({total_in} in / {total_out} out tokens, {turn + 1} turns)")
+            print(f"\nResearch complete ({total_in} in / {total_out} out tokens, {turn + 1} turns)")
             return final_text
 
     # If we hit max_turns, extract whatever text we have
-    print(f"\n⚠️ Hit max turns ({max_turns}). Extracting final response...")
+    print(f"\nWarning: Hit max turns ({max_turns}). Extracting final response...")
     # Ask for a final summary
-    messages.append({
-        "role": "user",
-        "content": (
-            "You've used all available research turns. Please now produce your "
-            "final structured research brief based on everything you've gathered."
-        ),
-    })
+    messages.append(
+        {
+            "role": "user",
+            "content": (
+                "You've used all available research turns. Please now produce your "
+                "final structured research brief based on everything you've gathered."
+            ),
+        }
+    )
 
     try:
         response = client.messages.create(
@@ -353,10 +357,10 @@ def call_agentic_researcher(company_input: str, max_turns: int = 5) -> str:
         total_in += response.usage.input_tokens
         total_out += response.usage.output_tokens
         final_text = response.content[0].text
-        print(f"✅ Research complete ({total_in} in / {total_out} out tokens, {max_turns}+ turns)")
+        print(f"Research complete ({total_in} in / {total_out} out tokens, {max_turns}+ turns)")
         return final_text
     except APIError:
-        print(f"❌ Failed to get final summary after {max_turns} turns.")
+        print(f"Error: Failed to get final summary after {max_turns} turns.")
         raise SystemExit(1)
 
 
@@ -368,7 +372,9 @@ def run_researcher(company_input: str) -> str:
         raise
     except Exception as e:
         # Fallback to legacy single-turn if agentic fails
-        print(f"\n⚠️ Agentic researcher failed ({e}). Falling back to legacy mode.")
+        print(
+            f"\nWarning: Agentic researcher failed ({e}). Falling back to legacy mode.", flush=True
+        )
         return call_agent(
             system_prompt=RESEARCHER_SYSTEM_LEGACY,
             user_message=f"""Research this target company for a smart manufacturing sales engagement:
@@ -624,22 +630,23 @@ Write a short, personalized cold email. Plain text only.""",
 # Pipeline Orchestrator
 # ─────────────────────────────────────────────
 
+
 def run_pipeline(company_input: str, output_dir: str = OUTPUTS_DIR) -> dict:
     """
     Run the full 3-agent sales pipeline.
-    
+
     Args:
         company_input: Description of the target company
         output_dir: Directory to save the proposal
-    
+
     Returns:
         dict with research, solution_map, proposal, and file path
     """
-    print("\n" + "🏭" * 30)
-    print("  3VIEW MACHINE365 SALES AGENT PIPELINE")
-    print("🏭" * 30)
-    print(f"\n📋 Target: {company_input}")
-    print(f"⏰ Started: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    print("\n" + "=" * 60)
+    print("  AGENTIC PIPELINE")
+    print("=" * 60)
+    print(f"\nTarget: {company_input}")
+    print(f"Started: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
 
     # Extract company name (first line or first few words)
     company_name = company_input.split(",")[0].split("\n")[0].strip()
@@ -678,12 +685,12 @@ def run_pipeline(company_input: str, output_dir: str = OUTPUTS_DIR) -> dict:
     with open(debug_path, "w") as f:
         json.dump(full_output, f, indent=2, ensure_ascii=False)
 
-    print(f"\n{'='*60}")
-    print(f"✅ PIPELINE COMPLETE")
-    print(f"{'='*60}")
-    print(f"📄 Proposal saved: {proposal_path}")
-    print(f"🔍 Debug output:   {debug_path}")
-    print(f"⏰ Finished: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    print(f"\n{'=' * 60}")
+    print("PIPELINE COMPLETE")
+    print(f"{'=' * 60}")
+    print(f"Proposal saved: {proposal_path}")
+    print(f"Debug output:   {debug_path}")
+    print(f"Finished: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
 
     return {
         "research": research,

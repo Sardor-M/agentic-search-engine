@@ -1,0 +1,43 @@
+{
+  "name": "MV900",
+  "category": "Process Monitoring System (Hardware)",
+  "tagline": "A New Era in Smart Process Monitoring",
+  "description": "The MV900 is a process monitoring system that analyzes sensor signals in real time on metal forming sites to monitor product and equipment conditions. During forming, equipment pressure is monitored to stop machines instantly when defects occur, preventing continuous errors. Combined with sensors and AI, it tracks 4M, power, and equipment changes for real-time production management.",
+  "specs": {
+    "display": "15-inch Touch Interface",
+    "os": "Windows IoT 10",
+    "size": "393x317x74 mm (WxHxD)",
+    "power": "DC12V",
+    "channels": "8 channels",
+    "communication": "WiFi, 1x Ethernet, 2x USB 2.0",
+    "cycle_signal": "Proximity sensor or Encoder",
+    "io_ports": "Input 4 ports, Output 6 ports"
+  },
+  "key_features": [
+    "Flexible application and expansion — adaptable to changing factory environments",
+    "AI-powered detection of changes in equipment status for predictive maintenance",
+    "Hyperconnectivity — cloud-connected for real-time monitoring anywhere",
+    "Product-level carbon calculation for ESG reporting"
+  ],
+  "key_functions": [
+    "Catch defective products early via real-time press force analysis",
+    "Detect mold damage early through sensor signal monitoring",
+    "Detect equipment abnormalities before they cause downtime",
+    "Mold life management — extend mold lifespan through smart monitoring",
+    "Manage production items efficiently with real-time tracking",
+    "Emergency equipment shutdown when critical defects are detected"
+  ],
+  "expected_benefits": [
+    "Cut mold costs — extend mold life through smart monitoring",
+    "Predictive maintenance — instant detection of equipment issues",
+    "Lower defect rate — real-time monitoring stops defects before they happen",
+    "Lower energy costs — optimize electricity rates through AI power analysis",
+    "Streamline ESG management — automate energy and carbon tracking"
+  ],
+  "best_for": [
+    "Metal forming / stamping factories",
+    "Press machine operations",
+    "Forging operations",
+    "Any factory with mechanical presses needing defect detection"
+  ]
+}
