@@ -1,4 +1,4 @@
-# Agentic Pipeline
+# agentic-search-engine
 
 An AI-powered B2B sales pipeline that automates company research, deal estimation, proposal generation, and cold email outreach for manufacturing companies. Built with Claude (Anthropic), ChromaDB RAG, agentic tool-use, DuckDuckGo search, and Gmail SMTP.
 
