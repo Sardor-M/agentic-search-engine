@@ -627,6 +627,38 @@ Write a short, personalized cold email. Plain text only.""",
 
 
 # ─────────────────────────────────────────────
+# Agent 6: Quick Summary (lightweight fit assessment)
+# ─────────────────────────────────────────────
+
+QUICK_SUMMARY_SYSTEM = f"""You are a B2B sales analyst at 3View Inc.
+Given a brief company description and a deal estimate, produce a concise fit assessment
+(3-8 sentences) covering: what the company does, why they are a fit for MV900 / Machine365.Ai,
+the estimated deal size, and a recommended next step.
+
+{COMPANY_PROFILE}
+
+Be specific. Do NOT repeat the deal JSON — summarize it naturally.
+Output plain text only, no markdown headers.
+"""
+
+
+def run_quick_summary(company_brief: str, deal_json: str) -> str:
+    """Agent 6: Quick fit assessment for prospect table."""
+    return call_agent(
+        system_prompt=QUICK_SUMMARY_SYSTEM,
+        user_message=f"""Summarize this prospect's fit for 3View in 3-8 sentences.
+
+=== COMPANY INFO ===
+{company_brief}
+
+=== DEAL ESTIMATE ===
+{deal_json}""",
+        agent_name="Quick Summary",
+        temperature=0.5,
+    )
+
+
+# ─────────────────────────────────────────────
 # Pipeline Orchestrator
 # ─────────────────────────────────────────────
 
