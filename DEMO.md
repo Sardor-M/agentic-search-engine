@@ -1,4 +1,4 @@
-# Agentic Pipeline — Demo Guide
+# Agentic Outreach Pipeline — Demo Guide
 
 Quick-start guide to run and test every feature of the pipeline.
 
